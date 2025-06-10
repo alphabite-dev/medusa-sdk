@@ -1,4 +1,5 @@
 import Medusa from '@medusajs/js-sdk'
+export * from './plugins'
 
 export type AlphabiteClientOptions = {
   getAuthHeader?: () => Promise<Record<string, string>> | Record<string, string>

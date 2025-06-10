@@ -1,6 +1,6 @@
 {
   "name": "@alphabite/medusa-client",
-  "version": "0.1.2",
+  "version": "0.1.8",
   "description": "Extended Medusa utility sdk client, that adds Alphabite's plugins endpoints",
   "author": "Alphabite",
   "license": "MIT",
@@ -9,15 +9,17 @@
   },
   "homepage": "https://github.com/alphabite-soft/medusa-client#readme",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "!src"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
-    "publish": "npm publish --access public"
+    "publish:public": "npm publish --access public"
   },
   "keywords": [
     "medusa client",
@@ -26,13 +28,14 @@
     "medusa other"
   ],
   "devDependencies": {
+    "@medusajs/js-sdk": "^2.8.3",
+    "@medusajs/types": "^2.8.3",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^8.57.0",
     "prettier": "^3",
-    "typescript": "^5",
-    "@medusajs/js-sdk": "^2.8.3",
-    "@medusajs/types": "^2.8.3"
+    "tsup": "^8.5.0",
+    "typescript": "^5"
   },
   "peerDependencies": {
     "@medusajs/js-sdk": "^2.8.3",
