@@ -1,6 +1,6 @@
 import { BaseProduct } from '@medusajs/types/dist/http/product/common'
-import { Client } from '@medusajs/js-sdk'
-import { AlphabiteClientOptions } from '..'
+import Medusa, { ClientHeaders } from '@medusajs/js-sdk'
+import { AlphabiteClientOptions, Plugin } from '..'
 
 export interface WishlistOutput {
   wishlist: {
@@ -24,39 +24,40 @@ export interface WishlistItem {
 }
 
 type WishlistEndpoints = {
-  list: () => Promise<WishlistOutput>
-  add: (productId: string) => Promise<WishlistOutput>
-  remove: (productId: string) => Promise<WishlistOutput>
-}
-
-type Plugin<Name extends string, Endpoints> = {
-  name: Name
-  endpoints: (client: Client, options?: AlphabiteClientOptions) => Endpoints
+  list: (headers?: ClientHeaders) => Promise<WishlistOutput>
+  add: (productId: string, headers?: ClientHeaders) => Promise<WishlistOutput>
+  remove: (
+    productId: string,
+    headers?: ClientHeaders,
+  ) => Promise<WishlistOutput>
 }
 
 export const wishlistPlugin: Plugin<'wishlist', WishlistEndpoints> = {
   name: 'wishlist' as const,
-  endpoints: (client: Client, options?: AlphabiteClientOptions) => ({
-    list: async () =>
-      client.fetch('/store/customers/me/wishlists', {
+  endpoints: (sdk: Medusa, options?: AlphabiteClientOptions) => ({
+    list: async (headers) =>
+      sdk.client.fetch('/store/customers/me/wishlists', {
         method: 'GET',
         headers: {
           ...(await options?.getAuthHeader?.()),
+          ...headers,
         },
       }),
-    add: async (productId: string) =>
-      client.fetch('/store/customers/me/wishlists/items', {
+    add: async (productId, headers) =>
+      sdk.client.fetch('/store/customers/me/wishlists/items', {
         method: 'POST',
         body: JSON.stringify({ product_id: productId }),
         headers: {
           ...(await options?.getAuthHeader?.()),
+          ...headers,
         },
       }),
-    remove: async (productId: string) =>
-      client.fetch(`/store/customers/me/wishlists/items/${productId}`, {
+    remove: async (productId, headers) =>
+      sdk.client.fetch(`/store/customers/me/wishlists/items/${productId}`, {
         method: 'DELETE',
         headers: {
           ...(await options?.getAuthHeader?.()),
+          ...headers,
         },
       }),
   }),
