@@ -1,38 +1,35 @@
-// Options type for extensibility
+import Medusa from '@medusajs/js-sdk'
+
 export type AlphabiteClientOptions = {
   getAuthHeader?: () => Promise<Record<string, string>> | Record<string, string>
 }
 
-// Generic plugin type definition
 export type Plugin<Name extends string, Endpoints> = {
   name: Name
   endpoints: (client: any, options?: AlphabiteClientOptions) => Endpoints
 }
 
-// Utility type to map plugins to their endpoints
 export type PluginsToAlphabite<T extends readonly Plugin<any, any>[]> = {
   [K in T[number] as K['name']]: ReturnType<K['endpoints']>
 }
 
-// The extensible client class
 export class AlphabiteMedusaClient<
   TPlugins extends readonly Plugin<any, any>[],
-  TBaseClient extends { fetch: (...args: any[]) => any },
-> {
+  TOptions extends AlphabiteClientOptions = AlphabiteClientOptions,
+> extends Medusa {
   public alphabite: PluginsToAlphabite<TPlugins>
-  protected client: TBaseClient
-  protected options?: AlphabiteClientOptions
+  protected options?: TOptions
 
   constructor(
-    baseClient: TBaseClient,
+    medusaOptions: ConstructorParameters<typeof Medusa>[0],
     plugins: TPlugins,
-    options?: AlphabiteClientOptions,
+    options?: TOptions,
   ) {
-    this.client = baseClient
+    super(medusaOptions)
     this.options = options
     const endpoints: any = {}
     plugins.forEach((plugin) => {
-      endpoints[plugin.name] = plugin.endpoints(this.client, this.options)
+      endpoints[plugin.name] = plugin.endpoints(this, this.options)
     })
     this.alphabite = endpoints
   }
