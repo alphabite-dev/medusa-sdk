@@ -16,7 +16,8 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint src --ext .ts",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "publish": "npm publish --access public"
   },
   "keywords": [
     "medusa client",
