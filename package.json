@@ -1,6 +1,6 @@
 {
   "name": "@alphabite/medusa-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Extended Medusa utility sdk client, that adds Alphabite's plugins endpoints",
   "author": "Alphabite",
   "license": "MIT",
@@ -30,7 +30,13 @@
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^8.57.0",
     "prettier": "^3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@medusajs/js-sdk": "^2.8.3",
+    "@medusajs/types": "^2.8.3"
+  },
+  "peerDependencies": {
+    "@medusajs/js-sdk": "^2.8.3",
+    "@medusajs/types": "^2.8.3"
   },
   "repository": {
     "type": "git",
