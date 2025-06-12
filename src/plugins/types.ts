@@ -1,6 +1,5 @@
-export interface PaginatedOutput<T> {
+export interface PaginatedOutput<T> extends PaginatedOutputMeta {
   data: T[]
-  meta: PaginatedOutputMeta
 }
 
 export interface PaginatedOutputMeta {
@@ -8,4 +7,9 @@ export interface PaginatedOutputMeta {
   limit: number
   offset: number
   totalPages: number
+}
+
+export interface PaginatedInput {
+  limit?: number
+  offset?: number
 }
