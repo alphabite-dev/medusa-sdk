@@ -1,18 +1,20 @@
 import Medusa, { ClientHeaders } from '@medusajs/js-sdk'
 import { AlphabiteClientOptions, Plugin } from '..'
 
-export interface PaypalClientToken {
+export interface CreateClientTokenOutput {
   client_token: string
 }
 
 type PaypalEndpoints = {
-  get_client_token: (headers?: ClientHeaders) => Promise<PaypalClientToken>
+  createClientToken: (
+    headers?: ClientHeaders,
+  ) => Promise<CreateClientTokenOutput>
 }
 
 export const paypalPlugin: Plugin<'paypal', PaypalEndpoints> = {
   name: 'paypal' as const,
   endpoints: (sdk: Medusa, options?: AlphabiteClientOptions) => ({
-    get_client_token: async (headers) =>
+    createClientToken: async (headers) =>
       sdk.client.fetch('/store/paypal/client-token', {
         method: 'POST',
         headers: {

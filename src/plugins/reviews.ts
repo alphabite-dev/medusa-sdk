@@ -1,12 +1,13 @@
 import Medusa, { ClientHeaders } from '@medusajs/js-sdk'
 import { AlphabiteClientOptions, Plugin } from '..'
+import { PaginatedOutput, PaginatedOutputMeta } from './types'
 
 export interface ReviewsRatingAggregate {
   average: number
   counts: { rating: number; count: number }[]
 }
 
-export interface ReviewProps {
+export interface Review {
   title: string
   content: string
   first_name: string
@@ -17,22 +18,19 @@ export interface ReviewProps {
   image_urls?: string[]
 }
 
-export interface ReviewsOutput {
-  count: number
-  limit: number
-  offset: number
-  rating_aggregate: ReviewsRatingAggregate
-  reviews: ReviewProps[]
-  total_pages: number
-}
-
-export interface ReviewListProps {
-  productId: string
+export interface ListReviewsInput {
+  product_id: string
   limit?: number
   pageParam?: number
 }
 
-type AddReviewInput = {
+export interface ListReviewsOutput extends PaginatedOutput<Review> {
+  meta: PaginatedOutputMeta & {
+    rating_aggregate: ReviewsRatingAggregate
+  }
+}
+
+export interface CreateReviewInput {
   first_name: string
   last_name: string
   content: string
@@ -42,22 +40,26 @@ type AddReviewInput = {
   title?: string | undefined
 }
 
+export interface CreateReviewOutput {
+  review: Review
+}
+
 type ReviewsEndpoints = {
   list: (
-    { productId, limit, pageParam }: ReviewListProps,
+    { product_id, limit, pageParam }: ListReviewsInput,
     headers?: ClientHeaders,
-  ) => Promise<ReviewsOutput>
-  add: (
-    input: AddReviewInput,
+  ) => Promise<ListReviewsOutput>
+  create: (
+    input: CreateReviewInput,
     headers?: ClientHeaders,
-  ) => Promise<ReviewsOutput>
+  ) => Promise<CreateReviewOutput>
 }
 
 export const reviewsPlugin: Plugin<'reviews', ReviewsEndpoints> = {
   name: 'reviews' as const,
   endpoints: (sdk: Medusa, options?: AlphabiteClientOptions) => ({
-    list: async ({ productId, limit = 5, pageParam = 1 }, headers) =>
-      sdk.client.fetch(`/store/products/${productId}/reviews`, {
+    list: async ({ product_id, limit = 5, pageParam = 1 }, headers) =>
+      sdk.client.fetch(`/store/products/${product_id}/reviews`, {
         method: 'GET',
         headers: {
           ...(await options?.getAuthHeader?.()),
@@ -68,7 +70,7 @@ export const reviewsPlugin: Plugin<'reviews', ReviewsEndpoints> = {
           offset: (Math.max(pageParam, 1) - 1) * limit,
         },
       }),
-    add: async (input, headers) =>
+    create: async (input, headers) =>
       sdk.client.fetch('/store/reviews', {
         method: 'POST',
         body: input,

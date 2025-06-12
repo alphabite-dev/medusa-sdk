@@ -1,6 +1,6 @@
 {
   "name": "@alphabite/medusa-client",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Extended Medusa utility sdk client, that adds Alphabite's plugins endpoints",
   "author": "Alphabite",
   "license": "MIT",
