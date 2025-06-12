@@ -18,7 +18,6 @@ export interface WishlistItem {
   wishlist_id: string
   created_at: string
   updated_at: string
-  variants: BaseProduct['variants']
   product: BaseProduct
 }
 
@@ -125,7 +124,7 @@ export const wishlistPlugin: Plugin<'wishlist', WishlistEndpoints> = {
   name: 'wishlist' as const,
   endpoints: (sdk: Medusa, options?: AlphabiteClientOptions) => ({
     list: async ({ limit = 10, offset = 0 }, headers) =>
-      sdk.client.fetch('/store/customers/me/wishlists', {
+      sdk.client.fetch('/store//wishlists', {
         method: 'GET',
         headers: {
           ...(await options?.getAuthHeader?.()),
