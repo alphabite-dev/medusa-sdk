@@ -5,11 +5,12 @@ import { PaginatedInput, PaginatedOutput } from './types'
 
 export interface Wishlist {
   id: string
-  customer_id: string
+  customer_id: string | null
   sales_channel_id: string
   items: WishlistItem[]
   created_at: string
   updated_at: string
+  deleted_at: string | null
 }
 
 export interface WishlistItem {
@@ -18,6 +19,7 @@ export interface WishlistItem {
   wishlist_id: string
   created_at: string
   updated_at: string
+  deleted_at: string | null
   product: BaseProduct
 }
 
@@ -34,14 +36,16 @@ export interface AddItemToWishlistInput {
   wishlist_id: string
 }
 
-export interface AddItemToWishlistOutput extends Wishlist {}
+export interface AddItemToWishlistOutput
+  extends PaginatedOutput<WishlistItem> {}
 
-export interface RemoveItemToWishlistInput {
+export interface RemoveItemFromWishlistInput {
   product_id: string
   wishlist_id: string
 }
 
-export interface RemoveItemToWishlistOutput extends Wishlist {}
+export interface RemoveItemFromWishlistOutput
+  extends PaginatedOutput<WishlistItem> {}
 
 export interface CreateWishlistInput {
   name: string
@@ -98,9 +102,9 @@ type WishlistEndpoints = {
     headers?: ClientHeaders,
   ) => Promise<AddItemToWishlistOutput>
   removeItem: (
-    input: RemoveItemToWishlistInput,
+    input: RemoveItemFromWishlistInput,
     headers?: ClientHeaders,
-  ) => Promise<RemoveItemToWishlistOutput>
+  ) => Promise<RemoveItemFromWishlistOutput>
   create: (
     input: CreateWishlistInput,
     headers?: ClientHeaders,
@@ -123,26 +127,29 @@ type WishlistEndpoints = {
 export const wishlistPlugin: Plugin<'wishlist', WishlistEndpoints> = {
   name: 'wishlist' as const,
   endpoints: (sdk: Medusa, options?: AlphabiteClientOptions) => ({
-    list: async ({ limit = 10, offset = 0 }, headers) =>
-      sdk.client.fetch('/store//wishlists', {
+    list: async ({ limit = 10, offset = 0, order, fields }, headers) =>
+      sdk.client.fetch('/store/wishlists', {
         method: 'GET',
         headers: {
           ...(await options?.getAuthHeader?.()),
           ...headers,
         },
-        query: { limit, offset },
+        query: { limit, offset, order, fields },
       }),
-    listItems: async ({ wishlist_id, limit = 10, offset = 0 }, headers) =>
+    listItems: async (
+      { wishlist_id, limit = 10, offset = 0, fields, order },
+      headers,
+    ) =>
       sdk.client.fetch(`/store/wishlists/${wishlist_id}/items`, {
         method: 'GET',
         headers: {
           ...(await options?.getAuthHeader?.()),
           ...headers,
         },
-        query: { limit, offset },
+        query: { limit, offset, order, fields },
       }),
     addItem: async ({ product_id, wishlist_id }, headers) =>
-      sdk.client.fetch('/store/wishlists/items', {
+      sdk.client.fetch(`/store/wishlists/${wishlist_id}/items`, {
         method: 'POST',
         body: { product_id, wishlist_id },
         headers: {
