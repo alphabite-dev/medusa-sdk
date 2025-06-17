@@ -1,16 +1,20 @@
-import { BaseProduct } from '@medusajs/types/dist/http/product/common'
+import {
+  BaseProduct,
+  BaseProductVariant,
+} from '@medusajs/types/dist/http/product/common'
 import Medusa, { ClientHeaders } from '@medusajs/js-sdk'
 import { AlphabiteClientOptions, Plugin } from '..'
 import { PaginatedInput, PaginatedOutput } from './types'
+import { PriceDTO } from '@medusajs/types'
 
 export interface Wishlist {
   id: string
   customer_id: string | null
   sales_channel_id: string
-  items: WishlistItem[]
   created_at: string
   updated_at: string
   deleted_at: string | null
+  items: WishlistItem[]
 }
 
 export interface WishlistItem {
@@ -20,32 +24,38 @@ export interface WishlistItem {
   created_at: string
   updated_at: string
   deleted_at: string | null
-  product: BaseProduct
+  product_variant:
+    | (Omit<BaseProductVariant, 'product'> & {
+        product: Pick<BaseProduct, 'id' | 'thumbnail'>
+        prices: PriceDTO[]
+      })
+    | null
 }
 
 //No input for ListWishlist
 
 export interface ListWishlistsInput extends PaginatedInput {}
 
+//Currently list wishlist route  return wishlist items without product field
 export interface ListWishlistsOutput extends PaginatedOutput<Wishlist> {
   //List many wishlists
 }
 
 export interface AddItemToWishlistInput {
   product_id: string
-  wishlist_id: string
+  id: string
 }
 
-export interface AddItemToWishlistOutput
-  extends PaginatedOutput<WishlistItem> {}
+export interface AddItemToWishlistOutput extends WishlistItem {}
 
 export interface RemoveItemFromWishlistInput {
   product_id: string
-  wishlist_id: string
+  id: string
 }
 
-export interface RemoveItemFromWishlistOutput
-  extends PaginatedOutput<WishlistItem> {}
+export interface RemoveItemFromWishlistOutput {
+  id: string
+}
 
 export interface CreateWishlistInput {
   name: string
@@ -54,38 +64,41 @@ export interface CreateWishlistInput {
 export interface CreateWishlistOutput extends Wishlist {}
 
 export interface TransferWishlistInput {
-  wishlist_id: string
+  id: string
+}
+
+export interface TransferWishlistOutput {
+  id: string
 }
 
 export interface RetrieveWishlistInput {
-  wishlist_id: string
+  id: string
 }
 
 export interface RetrieveWishlistOutput extends Wishlist {}
 
 export interface DeleteWishlistInput {
-  wishlist_id: string
+  id: string
+}
+
+export interface DeleteWishlistOutput {
+  id: string
 }
 
 export interface UpdateWishlistInput {
-  wishlist_id: string
+  id: string
   name?: string
 }
 
-export interface UpdateWishlistOutput extends Wishlist {}
+export interface UpdateWishlistOutput extends Omit<Wishlist, 'items'> {}
 
 export interface ListItemsInput extends PaginatedInput {
-  wishlist_id: string
+  id: string
 }
 
 export interface ListItemsOutput extends PaginatedOutput<WishlistItem> {}
 
 //TODO:
-// retrieve - endpoint for get wishlist by id
-// list - endpoint for list all wishlists
-// create wishlist endpoint
-// delete wishlist endpoint
-//update wishlist endpoint
 //another endpoint for guest user create and get - save id inside cookie
 
 type WishlistEndpoints = {
@@ -112,12 +125,15 @@ type WishlistEndpoints = {
   transfer: (
     input: TransferWishlistInput,
     headers?: ClientHeaders,
-  ) => Promise<void>
+  ) => Promise<TransferWishlistOutput>
   retrieve: (
     input: RetrieveWishlistInput,
     headers?: ClientHeaders,
   ) => Promise<RetrieveWishlistOutput>
-  delete: (input: DeleteWishlistInput, headers?: ClientHeaders) => Promise<void>
+  delete: (
+    input: DeleteWishlistInput,
+    headers?: ClientHeaders,
+  ) => Promise<DeleteWishlistOutput>
   update: (
     input: UpdateWishlistInput,
     headers?: ClientHeaders,
@@ -136,11 +152,8 @@ export const wishlistPlugin: Plugin<'wishlist', WishlistEndpoints> = {
         },
         query: { limit, offset, order, fields },
       }),
-    listItems: async (
-      { wishlist_id, limit = 10, offset = 0, fields, order },
-      headers,
-    ) =>
-      sdk.client.fetch(`/store/wishlists/${wishlist_id}/items`, {
+    listItems: async ({ id, limit = 10, offset = 0, fields, order }, headers) =>
+      sdk.client.fetch(`/store/wishlists/${id}/items`, {
         method: 'GET',
         headers: {
           ...(await options?.getAuthHeader?.()),
@@ -148,17 +161,17 @@ export const wishlistPlugin: Plugin<'wishlist', WishlistEndpoints> = {
         },
         query: { limit, offset, order, fields },
       }),
-    addItem: async ({ product_id, wishlist_id }, headers) =>
-      sdk.client.fetch(`/store/wishlists/${wishlist_id}/items`, {
+    addItem: async ({ product_id, id }, headers) =>
+      sdk.client.fetch(`/store/wishlists/${id}/items`, {
         method: 'POST',
-        body: { product_id, wishlist_id },
+        body: { product_id, id },
         headers: {
           ...(await options?.getAuthHeader?.()),
           ...headers,
         },
       }),
-    removeItem: async ({ product_id, wishlist_id }, headers) =>
-      sdk.client.fetch(`/store/wishlists/${wishlist_id}/items/${product_id}`, {
+    removeItem: async ({ product_id, id }, headers) =>
+      sdk.client.fetch(`/store/wishlists/${id}/items/${product_id}`, {
         method: 'DELETE',
         headers: {
           ...(await options?.getAuthHeader?.()),
@@ -174,32 +187,32 @@ export const wishlistPlugin: Plugin<'wishlist', WishlistEndpoints> = {
           ...headers,
         },
       }),
-    transfer: async ({ wishlist_id }, headers) =>
-      sdk.client.fetch(`/store/wishlists/${wishlist_id}/transfer`, {
+    transfer: async ({ id }, headers) =>
+      sdk.client.fetch(`/store/wishlists/${id}/transfer`, {
         method: 'POST',
         headers: {
           ...(await options?.getAuthHeader?.()),
           ...headers,
         },
       }),
-    retrieve: async ({ wishlist_id }, headers) =>
-      sdk.client.fetch(`/store/wishlists/${wishlist_id}`, {
+    retrieve: async ({ id }, headers) =>
+      sdk.client.fetch(`/store/wishlists/${id}`, {
         method: 'GET',
         headers: {
           ...(await options?.getAuthHeader?.()),
           ...headers,
         },
       }),
-    delete: async ({ wishlist_id }, headers) =>
-      sdk.client.fetch(`/store/wishlists/${wishlist_id}`, {
+    delete: async ({ id }, headers) =>
+      sdk.client.fetch(`/store/wishlists/${id}`, {
         method: 'DELETE',
         headers: {
           ...(await options?.getAuthHeader?.()),
           ...headers,
         },
       }),
-    update: async ({ wishlist_id, ...input }, headers) =>
-      sdk.client.fetch(`/store/wishlists/${wishlist_id}`, {
+    update: async ({ id, ...input }, headers) =>
+      sdk.client.fetch(`/store/wishlists/${id}`, {
         method: 'PUT',
         body: input,
         headers: {
