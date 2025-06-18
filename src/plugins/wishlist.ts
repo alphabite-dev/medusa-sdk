@@ -42,14 +42,14 @@ export interface ListWishlistsOutput extends PaginatedOutput<Wishlist> {
 }
 
 export interface AddItemToWishlistInput {
-  product_id: string
+  product_variant_id: string
   id: string
 }
 
 export interface AddItemToWishlistOutput extends WishlistItem {}
 
 export interface RemoveItemFromWishlistInput {
-  product_id: string
+  wishlist_item_id: string
   id: string
 }
 
@@ -58,7 +58,8 @@ export interface RemoveItemFromWishlistOutput {
 }
 
 export interface CreateWishlistInput {
-  name: string
+  name?: string
+  sales_channel_id: string
 }
 
 export interface CreateWishlistOutput extends Wishlist {}
@@ -161,27 +162,27 @@ export const wishlistPlugin: Plugin<'wishlist', WishlistEndpoints> = {
         },
         query: { limit, offset, order, fields },
       }),
-    addItem: async ({ product_id, id }, headers) =>
-      sdk.client.fetch(`/store/wishlists/${id}/items`, {
+    addItem: async ({ product_variant_id, id }, headers) =>
+      sdk.client.fetch(`/store/wishlists/${id}/add-item`, {
         method: 'POST',
-        body: { product_id, id },
+        body: { product_variant_id },
         headers: {
           ...(await options?.getAuthHeader?.()),
           ...headers,
         },
       }),
-    removeItem: async ({ product_id, id }, headers) =>
-      sdk.client.fetch(`/store/wishlists/${id}/items/${product_id}`, {
+    removeItem: async ({ wishlist_item_id, id }, headers) =>
+      sdk.client.fetch(`/store/wishlists/${id}/items/${wishlist_item_id}`, {
         method: 'DELETE',
         headers: {
           ...(await options?.getAuthHeader?.()),
           ...headers,
         },
       }),
-    create: async ({ name }, headers) =>
+    create: async ({ name, sales_channel_id }, headers) =>
       sdk.client.fetch('/store/wishlists', {
         method: 'POST',
-        body: { name },
+        body: { name, sales_channel_id },
         headers: {
           ...(await options?.getAuthHeader?.()),
           ...headers,

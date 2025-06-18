@@ -14,7 +14,7 @@ export type PluginsToAlphabite<T extends readonly Plugin<any, any>[]> = {
   [K in T[number] as K['name']]: ReturnType<K['endpoints']>
 }
 
-export class AlphabiteMedusaClient<
+export class AlphabiteMedusaSdk<
   TPlugins extends readonly Plugin<any, any>[],
   TOptions extends AlphabiteClientOptions = AlphabiteClientOptions,
 > extends Medusa {
