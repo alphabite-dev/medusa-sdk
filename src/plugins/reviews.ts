@@ -6,7 +6,7 @@ import { CustomerDTO, ProductDTO } from '@medusajs/types'
 export interface AggregateCounts {
   average: number
   counts: { rating: number; count: number }[]
-  product_id: string
+  product_id?: string
   total_count: number
 }
 
@@ -40,21 +40,20 @@ export interface ListReviewsInput extends PaginatedInput {
   verified_purchase_only?: boolean
   rating?: number
   include_product?: boolean
+  sort_by?: 'created_at' | 'rating'
+  order?: 'asc' | 'desc'
 }
 
 export interface ListReviewsOutput extends PaginatedOutput<Review> {}
 
-export interface ListProductReviewsInput extends PaginatedInput {
+export interface ListProductReviewsInput
+  extends Omit<ListReviewsInput, 'product_ids'> {
   product_id: string
-  my_reviews_only?: boolean
-  verified_purchase_only?: boolean
-  sort?: 'created_at' | 'rating'
-  order?: 'asc' | 'desc'
-  rating?: number
-  include_product?: boolean
 }
 
-export interface ListProductReviewsOutput extends PaginatedOutput<Review> {}
+export interface ListProductReviewsOutput
+  extends PaginatedOutput<Omit<Review, 'product'>>,
+    AggregateCounts {}
 
 export interface DeleteReviewInput {
   id: string
@@ -124,14 +123,6 @@ export const reviewsPlugin: Plugin<'reviews', ReviewsEndpoints> = {
           ...headers,
         },
       }),
-    delete: async ({ id }, headers) =>
-      sdk.client.fetch(`/store/reviews/${id}`, {
-        method: 'DELETE',
-        headers: {
-          ...(await options?.getAuthHeader?.()),
-          ...headers,
-        },
-      }),
     aggregateCounts: async ({ product_id, ...input }, headers) =>
       sdk.client.fetch(
         `/store/reviews/product/${product_id}/aggregate-counts`,
@@ -144,5 +135,13 @@ export const reviewsPlugin: Plugin<'reviews', ReviewsEndpoints> = {
           },
         },
       ),
+    delete: async ({ id }, headers) =>
+      sdk.client.fetch(`/store/reviews/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...(await options?.getAuthHeader?.()),
+          ...headers,
+        },
+      }),
   }),
 }
