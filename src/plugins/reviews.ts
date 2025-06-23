@@ -28,7 +28,7 @@ export interface CreateReviewInput {
   content: string
   rating: number
   product_id: string
-  image_base64s: string[]
+  image_urls: string[]
   title?: string
 }
 
