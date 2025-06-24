@@ -1,8 +1,15 @@
 import Medusa, { ClientHeaders } from '@medusajs/js-sdk'
 import { AlphabiteClientOptions, Plugin } from '..'
+import { StoreCartAddress, StoreCartLineItem } from '@medusajs/types'
 
 export interface CreateClientTokenOutput {
   client_token: string
+}
+
+export interface PaypalPaymentSessionInputData {
+  shipping_info?: StoreCartAddress
+  items?: StoreCartLineItem[]
+  email?: string
 }
 
 type PaypalEndpoints = {
