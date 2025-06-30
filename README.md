@@ -1,13 +1,13 @@
-# ⚙️ Alphabite Medusa Client
+# ⚙️ Alphabite Medusa Sdk
 
-[![npm version](https://img.shields.io/npm/v/@alphabite/medusa-client)](https://www.npmjs.com/package/@alphabite/medusa-client)
-[![npm downloads](https://img.shields.io/npm/dm/@alphabite/medusa-client)](https://www.npmjs.com/package/@alphabite/medusa-client)
-![MIT License](https://img.shields.io/npm/l/@alphabite/medusa-client)
-![Types Included](https://img.shields.io/npm/types/@alphabite/medusa-client)
+[![npm version](https://img.shields.io/npm/v/@alphabite/medusa-sdk)](https://www.npmjs.com/package/@alphabite/medusa-sdk)
+[![npm downloads](https://img.shields.io/npm/dm/@alphabite/medusa-sdk)](https://www.npmjs.com/package/@alphabite/medusa-sdk)
+![MIT License](https://img.shields.io/npm/l/@alphabite/medusa-sdk)
+![Types Included](https://img.shields.io/npm/types/@alphabite/medusa-sdk)
 
 > Drop-in replacement for `@medusajs/js-sdk` with plugin support for Wishlists, PayPal, Reviews, and more.
 
-The **Alphabite Medusa Client** wraps the Medusa JS SDK and adds support for rich frontend integrations via plugin architecture.
+The **Alphabite Medusa Sdk** wraps the Medusa JS SDK and adds support for rich frontend integrations via plugin architecture.
 
 ---
 
@@ -30,7 +30,7 @@ The **Alphabite Medusa Client** wraps the Medusa JS SDK and adds support for ric
 ## 📦 Installation
 
 ```bash
-npm install @alphabite/medusa-client
+npm install @alphabite/medusa-sdk
 ```
 
 ---
@@ -39,13 +39,13 @@ npm install @alphabite/medusa-client
 
 ```ts
 import {
-  AlphabiteMedusaClient,
+  AlphabiteMedusaSdk,
   wishlistPlugin,
   paypalPlugin,
   reviewsPlugin,
-} from '@alphabite/medusa-client'
+} from '@alphabite/medusa-sdk'
 
-const sdk = new AlphabiteMedusaClient(
+const sdk = new AlphabiteMedusaSdk(
   {
     baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
     debug: process.env.NODE_ENV === 'development',
@@ -83,9 +83,9 @@ const sdk = new Medusa({
 })
 
 // AFTER
-import { AlphabiteMedusaClient, wishlistPlugin } from '@alphabite/medusa-client'
+import { AlphabiteMedusaSdk, wishlistPlugin } from '@alphabite/medusa-sdk'
 
-const sdk = new AlphabiteMedusaClient({
+const sdk = new AlphabiteMedusaSdk({
     baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
     debug: process.env.NODE_ENV === 'development',
     publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
@@ -126,7 +126,7 @@ sdk.alphabite.wishlist
 ### 1. Global headers with `getAuthHeader`
 
 ```ts
-const sdk = new AlphabiteMedusaClient(
+const sdk = new AlphabiteMedusaSdk(
   { baseUrl },
   [wishlistPlugin],
   {
@@ -174,6 +174,8 @@ const { data: items } = await sdk.alphabite.wishlist.listItems({
 | Plugin        | Namespace         | Description                         |
 |---------------|-------------------|-------------------------------------|
 | `wishlist`    | `sdk.alphabite.wishlist` | Multi-wishlist system              |
+| `reviews`    | `sdk.alphabite.reviews` | Reviews              |
+| `paypal`    | `sdk.alphabite.paypal` | Paypal              |
 
 ---
 
@@ -192,11 +194,11 @@ Create a central instance:
 ```ts
 // lib/sdk.ts
 import {
-  AlphabiteMedusaClient,
+  AlphabiteMedusaSdk,
   wishlistPlugin,
-} from '@alphabite/medusa-client'
+} from '@alphabite/medusa-sdk'
 
-export const sdk = new AlphabiteMedusaClient(
+export const sdk = new AlphabiteMedusaSdk(
   { baseUrl: process.env.NEXT_PUBLIC_API_URL! },
   [wishlistPlugin],
   {
