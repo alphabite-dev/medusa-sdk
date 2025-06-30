@@ -1,13 +1,13 @@
 {
   "name": "@alphabite/medusa-sdk",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Extended Medusa utility sdk client, that adds Alphabite's plugins endpoints",
   "author": "Alphabite",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/alphabite-soft/medusa-client/issues"
+    "url": "https://github.com/alphabite-soft/medusa-sdk/issues"
   },
-  "homepage": "https://github.com/alphabite-soft/medusa-client#readme",
+  "homepage": "https://github.com/alphabite-soft/medusa-sdk#readme",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -23,7 +23,7 @@
   },
   "keywords": [
     "medusa client",
-    "alphabite medusa client",
+    "alphabite medusa sdk",
     "medusa v2",
     "medusa other"
   ],
@@ -43,7 +43,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/alphabite-soft/medusa-client.git"
+    "url": "git+ssh://git@github.com/alphabite-soft/medusa-sdk.git"
   },
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
