@@ -49,6 +49,7 @@ export interface ListReviewsOutput extends PaginatedOutput<Review> {}
 export interface ListProductReviewsInput
   extends Omit<ListReviewsInput, 'product_ids'> {
   product_id: string
+  include_aggregated_counts?: boolean
 }
 
 export interface ListProductReviewsOutput
