@@ -16,6 +16,7 @@ export interface Wishlist {
   deleted_at: string | null
   items: WishlistItem[]
   items_count: number
+  name: string | null
 }
 
 export interface WishlistItem {
