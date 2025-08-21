@@ -5,9 +5,15 @@ export type AlphabiteClientOptions = {
   getAuthHeader?: () => Promise<Record<string, string>> | Record<string, string>
 }
 
+export type AlphabiteMedusaConfig = ConstructorParameters<typeof Medusa>[0]
+
 export type Plugin<Name extends string, Endpoints> = {
   name: Name
-  endpoints: (client: any, options?: AlphabiteClientOptions) => Endpoints
+  endpoints: (
+    client: any,
+    options?: AlphabiteClientOptions,
+    medusaConfig?: AlphabiteMedusaConfig,
+  ) => Endpoints
 }
 
 export type PluginsToAlphabite<T extends readonly Plugin<any, any>[]> = {
@@ -20,17 +26,24 @@ export class AlphabiteMedusaSdk<
 > extends Medusa {
   public alphabite: PluginsToAlphabite<TPlugins>
   protected options?: TOptions
+  public medusaConfig: AlphabiteMedusaConfig
 
   constructor(
-    medusaOptions: ConstructorParameters<typeof Medusa>[0],
+    medusaOptions: AlphabiteMedusaConfig,
     plugins: TPlugins,
     options?: TOptions,
   ) {
     super(medusaOptions)
     this.options = options
+    this.medusaConfig = medusaOptions
+
     const endpoints: any = {}
     plugins.forEach((plugin) => {
-      endpoints[plugin.name] = plugin.endpoints(this, this.options)
+      endpoints[plugin.name] = plugin.endpoints(
+        this,
+        this.options,
+        this.medusaConfig,
+      )
     })
     this.alphabite = endpoints
   }

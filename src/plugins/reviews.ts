@@ -1,7 +1,7 @@
 import Medusa, { ClientHeaders } from '@medusajs/js-sdk'
-import { AlphabiteClientOptions, Plugin } from '..'
+import { AlphabiteClientOptions, AlphabiteMedusaConfig, Plugin } from '..'
 import { PaginatedInput, PaginatedOutput } from './types'
-import { CustomerDTO, ProductDTO } from '@medusajs/types'
+import { CustomerDTO, FileDTO, ProductDTO } from '@medusajs/types'
 
 export interface AggregateCounts {
   average: number
@@ -71,6 +71,10 @@ export interface AggregateCountsInput {
 
 export interface AggregateCountsOutput extends AggregateCounts {}
 
+export interface UploadImageFilesInput {
+  formData: FormData
+}
+
 type ReviewsEndpoints = {
   create: (
     input: CreateReviewInput,
@@ -92,11 +96,19 @@ type ReviewsEndpoints = {
     input: AggregateCountsInput,
     headers?: ClientHeaders,
   ) => Promise<AggregateCountsOutput>
+  uploadImageFiles: (
+    input: UploadImageFilesInput,
+    headers?: ClientHeaders,
+  ) => Promise<FileDTO[]>
 }
 
 export const reviewsPlugin: Plugin<'reviews', ReviewsEndpoints> = {
   name: 'reviews' as const,
-  endpoints: (sdk: Medusa, options?: AlphabiteClientOptions) => ({
+  endpoints: (
+    sdk: Medusa,
+    options?: AlphabiteClientOptions,
+    medusaConfig?: AlphabiteMedusaConfig,
+  ) => ({
     create: async (input, headers) =>
       sdk.client.fetch('/store/reviews', {
         method: 'POST',
@@ -144,5 +156,27 @@ export const reviewsPlugin: Plugin<'reviews', ReviewsEndpoints> = {
           ...headers,
         },
       }),
+    uploadImageFiles: async (input, headers) => {
+      const baseUrl = medusaConfig?.baseUrl
+      const publishableKey = medusaConfig?.publishableKey
+
+      if (!baseUrl || !publishableKey) {
+        throw new Error('Missing baseUrl or publishableKey')
+      }
+
+      const uploadedFiles = await fetch(
+        `${baseUrl}/store/reviews/files/images/upload`,
+        {
+          method: 'POST',
+          body: input.formData,
+          headers: {
+            ...headers,
+            'x-publishable-api-key': publishableKey,
+          },
+        },
+      )
+
+      return await uploadedFiles.json()
+    },
   }),
 }
