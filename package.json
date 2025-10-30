@@ -1,6 +1,6 @@
 {
   "name": "@alphabite/medusa-sdk",
-  "version": "0.5.7",
+  "version": "0.6.0",
   "description": "Extended Medusa utility sdk client, that adds Alphabite's plugins endpoints",
   "author": "Alphabite",
   "license": "MIT",
@@ -45,5 +45,8 @@
     "type": "git",
     "url": "git+ssh://git@github.com/alphabite-soft/medusa-sdk.git"
   },
-  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610",
+  "dependencies": {
+    "@alphabite/econt-types": "^1.1.0"
+  }
 }

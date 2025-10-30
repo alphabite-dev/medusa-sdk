@@ -1,0 +1,646 @@
+openapi: 3.0.0
+info:
+  title: Medusa Wishlist API
+  description: API for managing customer wishlists in a Medusa e-commerce store
+  version: 1.0.0
+servers:
+  - url: https://api.example.com
+    description: Example server
+
+paths:
+  /store/wishlists:
+    post:
+      summary: Create a new wishlist
+      operationId: createWishlist
+      tags:
+        - wishlists
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWishlistInput'
+      responses:
+        '200':
+          description: Wishlist created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWishlistOutput'
+    get:
+      summary: List wishlists
+      operationId: listWishlists
+      tags:
+        - wishlists
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/order'
+        - name: items_fields
+          in: query
+          description: Fields to include for wishlist items
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Wishlists retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListWishlistsOutput'
+
+  /store/wishlists/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the wishlist
+        schema:
+          type: string
+    get:
+      summary: Retrieve a wishlist
+      operationId: retrieveWishlist
+      tags:
+        - wishlists
+      parameters:
+        - name: items_fields
+          in: query
+          description: Fields to include for wishlist items
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Wishlist retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveWishlistOutput'
+    put:
+      summary: Update a wishlist
+      operationId: updateWishlist
+      tags:
+        - wishlists
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWishlistInput'
+      responses:
+        '200':
+          description: Wishlist updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateWishlistOutput'
+    delete:
+      summary: Delete a wishlist
+      operationId: deleteWishlist
+      tags:
+        - wishlists
+      responses:
+        '200':
+          description: Wishlist deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWishlistOutput'
+
+  /store/wishlists/total-items-count:
+    get:
+      summary: Get total items count
+      operationId: totalItemsCount
+      tags:
+        - wishlists
+      parameters:
+        - name: wishlist_id
+          in: query
+          description: The ID of the wishlist
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Total items count retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalItemsCountOutput'
+
+  /store/wishlists/{id}/transfer:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the wishlist
+        schema:
+          type: string
+    post:
+      summary: Transfer a wishlist to the current user
+      operationId: transferWishlist
+      tags:
+        - wishlists
+      responses:
+        '200':
+          description: Wishlist transferred successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferWishlistOutput'
+
+  /store/wishlists/{id}/share:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the wishlist
+        schema:
+          type: string
+    post:
+      summary: Share a wishlist
+      operationId: shareWishlist
+      tags:
+        - wishlists
+      responses:
+        '200':
+          description: Wishlist shared successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareWishlistOutput'
+
+  /store/wishlists/import:
+    post:
+      summary: Import a wishlist using a share token
+      operationId: importWishlist
+      tags:
+        - wishlists
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportWishlistInput'
+      responses:
+        '200':
+          description: Wishlist imported successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportWishlistOutput'
+
+  /store/wishlists/{id}/add-item:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the wishlist
+        schema:
+          type: string
+    post:
+      summary: Add an item to a wishlist
+      operationId: addItemToWishlist
+      tags:
+        - wishlist-items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddItemToWishlistInput'
+      responses:
+        '200':
+          description: Item added to wishlist successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddItemToWishlistOutput'
+
+  /store/wishlists/{id}/items:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the wishlist
+        schema:
+          type: string
+    get:
+      summary: List items in a wishlist
+      operationId: listWishlistItems
+      tags:
+        - wishlist-items
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: Wishlist items retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItemsOutput'
+
+  /store/wishlists/{id}/items/{wishlist_item_id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the wishlist
+        schema:
+          type: string
+      - name: wishlist_item_id
+        in: path
+        required: true
+        description: The ID of the wishlist item
+        schema:
+          type: string
+    delete:
+      summary: Remove an item from a wishlist
+      operationId: removeItemFromWishlist
+      tags:
+        - wishlist-items
+      responses:
+        '200':
+          description: Item removed from wishlist successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoveItemFromWishlistOutput'
+
+components:
+  parameters:
+    limit:
+      name: limit
+      in: query
+      description: The maximum number of items to retrieve
+      schema:
+        type: integer
+        default: 10
+    offset:
+      name: offset
+      in: query
+      description: The number of items to skip before retrieving the returned items
+      schema:
+        type: integer
+        default: 0
+    order:
+      name: order
+      in: query
+      description: The field to sort by and in which order (e.g., -created_at)
+      schema:
+        type: string
+
+  schemas:
+    PaginatedInput:
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: The maximum number of items to retrieve
+        offset:
+          type: integer
+          description: The number of items to skip before retrieving the returned items
+        order:
+          type: string
+          description: The field to sort by and in which order (e.g., -created_at)
+
+    PaginatedOutputMeta:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          description: Total number of pages
+        currentPage:
+          type: integer
+          description: Current page number
+        nextPage:
+          type: integer
+          description: Next page number
+        prevPage:
+          type: integer
+          description: Previous page number
+        skip:
+          type: integer
+          description: Number of items skipped
+        take:
+          type: integer
+          description: Number of items taken
+        count:
+          type: integer
+          description: Total number of items
+
+    # External type from @medusajs/types
+    PriceDTO:
+      type: object
+      description: Price data transfer object from @medusajs/types
+
+    # Note: BaseProduct and BaseProductVariant definitions are assumed as they're imported from @medusajs/types
+    WishlistItem:
+      type: object
+      required:
+        - id
+        - product_id
+        - wishlist_id
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        product_id:
+          type: string
+        wishlist_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+        product_variant:
+          type: object
+          nullable: true
+          description: Product variant data (BaseProductVariant from @medusajs/types)
+          properties:
+            id:
+              type: string
+            product:
+              type: object
+              description: Product data (BaseProduct from @medusajs/types)
+              properties:
+                id:
+                  type: string
+                thumbnail:
+                  type: string
+                  nullable: true
+            prices:
+              type: array
+              items:
+                $ref: '#/components/schemas/PriceDTO'
+
+    Wishlist:
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - sales_channel_id
+        - items
+        - items_count
+      properties:
+        id:
+          type: string
+        customer_id:
+          type: string
+          nullable: true
+        sales_channel_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/WishlistItem'
+        items_count:
+          type: integer
+          description: Count of items in the wishlist
+
+    CreateWishlistInput:
+      type: object
+      required:
+        - sales_channel_id
+      properties:
+        name:
+          type: string
+        sales_channel_id:
+          type: string
+
+    CreateWishlistOutput:
+      $ref: '#/components/schemas/Wishlist'
+
+    ListWishlistsInput:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedInput'
+        - type: object
+          properties:
+            items_fields:
+              type: array
+              items:
+                type: string
+              description: Fields to include for wishlist items
+
+    ListWishlistsOutput:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedOutputMeta'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Wishlist'
+
+    RetrieveWishlistInput:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        items_fields:
+          type: array
+          items:
+            type: string
+          description: Fields to include for wishlist items
+
+    RetrieveWishlistOutput:
+      $ref: '#/components/schemas/Wishlist'
+
+    UpdateWishlistInput:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+
+    UpdateWishlistOutput:
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - sales_channel_id
+        - items_count
+      properties:
+        id:
+          type: string
+        customer_id:
+          type: string
+          nullable: true
+        sales_channel_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+        items_count:
+          type: integer
+          description: Count of items in the wishlist
+
+    DeleteWishlistInput:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+
+    DeleteWishlistOutput:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+
+    TotalItemsCountInput:
+      type: object
+      properties:
+        wishlist_id:
+          type: string
+          description: The ID of the wishlist
+
+    TotalItemsCountOutput:
+      type: object
+      required:
+        - total_items_count
+      properties:
+        total_items_count:
+          type: integer
+          description: Total count of items in the wishlist
+
+    TransferWishlistInput:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+
+    TransferWishlistOutput:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+
+    ShareWishlistInput:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+
+    ShareWishlistOutput:
+      type: object
+      required:
+        - share_token
+      properties:
+        share_token:
+          type: string
+          description: Token used for sharing the wishlist
+
+    ImportWishlistInput:
+      type: object
+      required:
+        - share_token
+      properties:
+        share_token:
+          type: string
+          description: Token used for importing the wishlist
+
+    ImportWishlistOutput:
+      $ref: '#/components/schemas/Wishlist'
+
+    AddItemToWishlistInput:
+      type: object
+      required:
+        - product_variant_id
+      properties:
+        product_variant_id:
+          type: string
+          description: The ID of the product variant to add to the wishlist
+
+    AddItemToWishlistOutput:
+      $ref: '#/components/schemas/WishlistItem'
+
+    ListItemsInput:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedInput'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              description: The ID of the wishlist
+
+    ListItemsOutput:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedOutputMeta'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/WishlistItem'
+
+    RemoveItemFromWishlistInput:
+      type: object
+      required:
+        - wishlist_item_id
+        - id
+      properties:
+        wishlist_item_id:
+          type: string
+          description: The ID of the wishlist item to remove
+        id:
+          type: string
+          description: The ID of the wishlist
+
+    RemoveItemFromWishlistOutput:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
