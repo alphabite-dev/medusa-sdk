@@ -1,7 +1,7 @@
 import Medusa, { ClientHeaders } from '@medusajs/js-sdk'
+import { CustomerDTO, FileDTO, ProductDTO } from '@medusajs/types'
 import { AlphabiteClientOptions, AlphabiteMedusaConfig, Plugin } from '..'
 import { PaginatedInput, PaginatedOutput } from './types'
-import { CustomerDTO, FileDTO, ProductDTO } from '@medusajs/types'
 
 /**
  * Aggregate rating statistics for products
@@ -214,12 +214,15 @@ export const reviewsPlugin: Plugin<'reviews', ReviewsEndpoints> = {
         throw new Error('Missing baseUrl or publishableKey')
       }
 
+      const authHeader = await options?.getAuthHeader?.()
+
       const uploadedFiles = await fetch(
         `${baseUrl}/store/reviews/files/images/upload`,
         {
           method: 'POST',
           body: input.formData,
           headers: {
+            ...authHeader,
             ...headers,
             'x-publishable-api-key': publishableKey,
           },

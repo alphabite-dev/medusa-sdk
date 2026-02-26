@@ -22,14 +22,20 @@ export interface Wishlist {
 export interface WishlistItem {
   id: string
   product_id: string
+  product_variant_id: string
   wishlist_id: string
   created_at: string
   updated_at: string
   deleted_at: string | null
   product_variant:
     | (Omit<BaseProductVariant, 'product'> & {
-        product: Pick<BaseProduct, 'id' | 'thumbnail'>
+        product: Pick<BaseProduct, 'id' | 'thumbnail' | 'title' | 'handle'>
         prices: PriceDTO[]
+        calculated_price?: {
+          calculated_amount: number
+          currency_code: string
+        } | null
+        availability?: number | null
       })
     | null
 }
@@ -50,6 +56,8 @@ export interface ListWishlistsOutput extends PaginatedOutput<Wishlist> {}
 export interface RetrieveWishlistInput {
   id: string
   items_fields?: string[]
+  include_calculated_price?: boolean
+  include_inventory_count?: boolean
 }
 export interface RetrieveWishlistOutput extends Wishlist {}
 
