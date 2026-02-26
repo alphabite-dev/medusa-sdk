@@ -2,8 +2,28 @@ import Medusa, { ClientHeaders } from '@medusajs/js-sdk'
 import { AlphabiteClientOptions, Plugin } from '..'
 import type { City, Office, Quarter, Street } from '@alphabite/econt-types'
 
-export type EcontCity = City
-export type EcontOffice = Office
+export interface EcontCity extends City {
+  econtId?: number | string
+  regionName: string | null
+}
+
+export interface EcontOffice extends Office {
+  econtId?: number | string
+  fullAddress?: string
+  fullAddressEn?: string
+  postCode?: string
+  regionName?: string
+  latitude?: number
+  longitude?: number
+}
+
+export interface EcontQuarter extends Quarter {
+  econtId?: number | string
+}
+
+export interface EcontStreet extends Street {
+  econtId?: number | string
+}
 
 export interface Region {
   id?: number | string
@@ -94,7 +114,7 @@ export interface ValidatedAddress {
   /**
    * Validated city with full details (includes id, name, etc.)
    */
-  city: City
+  city: EcontCity
   /**
    * Full formatted address string
    */
@@ -156,6 +176,14 @@ export interface ListCitiesInput {
    * Sort order (e.g., "name", "-name" for descending)
    */
   order?: string
+  /**
+   * Econt specific city ID (numeric)
+   */
+  econtCityId?: string | number
+  /**
+   * Region name to filter cities by
+   */
+  region?: string
 }
 
 /**
@@ -166,7 +194,7 @@ export interface ListCitiesOutput {
    * Array of cities with full details from Econt
    * Includes: id, name, nameEn, postCode, region, etc.
    */
-  cities: City[]
+  cities: EcontCity[]
 }
 
 /**
@@ -203,6 +231,10 @@ export interface ListQuartersInput {
    * Sort order (e.g., "name", "-name" for descending)
    */
   order?: string
+  /**
+   * Econt specific city ID (numeric)
+   */
+  econtCityId?: string | number
 }
 
 /**
@@ -213,7 +245,7 @@ export interface ListQuartersOutput {
    * Array of quarters with details from Econt
    * Includes: id, cityID, name, nameEn
    */
-  quarters: Quarter[]
+  quarters: EcontQuarter[]
 }
 
 /**
@@ -264,6 +296,18 @@ export interface ListOfficesInput {
    * Sort order (e.g., "name", "-name" for descending)
    */
   order?: string
+  /**
+   * Econt specific city ID (numeric)
+   */
+  econtCityId?: string | number
+  /**
+   * Econt specific quarter ID (numeric)
+   */
+  econtQuarterId?: string | number
+  /**
+   * Econt specific office code (numeric)
+   */
+  econtOfficeCode?: string | number
 }
 
 /**
@@ -274,7 +318,7 @@ export interface ListOfficesOutput {
    * Array of offices with full details from Econt
    * Includes: code, name, address, phones, workingHours, etc.
    */
-  offices: Office[]
+  offices: EcontOffice[]
 }
 
 export interface ListStreetsInput {
@@ -285,10 +329,11 @@ export interface ListStreetsInput {
   limit?: number
   offset?: number
   order?: string
+  econtCityId?: string | number
 }
 
 export interface ListStreetsOutput {
-  streets: Street[]
+  streets: EcontStreet[]
 }
 
 export interface ListRegionsInput {
