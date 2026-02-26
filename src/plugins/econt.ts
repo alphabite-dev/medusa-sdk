@@ -1,6 +1,15 @@
 import Medusa, { ClientHeaders } from '@medusajs/js-sdk'
 import { AlphabiteClientOptions, Plugin } from '..'
-import type { City, Office, Quarter } from '@alphabite/econt-types'
+import type { City, Office, Quarter, Street } from '@alphabite/econt-types'
+
+export type EcontCity = City
+export type EcontOffice = Office
+
+export interface Region {
+  id?: number | string
+  name?: string
+  nameEn?: string
+}
 
 /**
  * Supported country codes for Econt delivery service
@@ -268,6 +277,33 @@ export interface ListOfficesOutput {
   offices: Office[]
 }
 
+export interface ListStreetsInput {
+  countryCode?: CountryCode
+  cityId: string
+  q?: string
+  fields?: string
+  limit?: number
+  offset?: number
+  order?: string
+}
+
+export interface ListStreetsOutput {
+  streets: Street[]
+}
+
+export interface ListRegionsInput {
+  countryCode?: CountryCode
+  q?: string
+  fields?: string
+  limit?: number
+  offset?: number
+  order?: string
+}
+
+export interface ListRegionsOutput {
+  regions: Region[]
+}
+
 /**
  * Available Econt plugin endpoints
  */
@@ -305,6 +341,14 @@ type EcontEndpoints = {
     input: ListOfficesInput,
     headers?: ClientHeaders,
   ) => Promise<ListOfficesOutput>
+  listStreets: (
+    input: ListStreetsInput,
+    headers?: ClientHeaders,
+  ) => Promise<ListStreetsOutput>
+  listRegions: (
+    input: ListRegionsInput,
+    headers?: ClientHeaders,
+  ) => Promise<ListRegionsOutput>
 }
 
 /**
@@ -350,6 +394,24 @@ export const econtPlugin: Plugin<'econt', EcontEndpoints> = {
           ...headers,
         },
         query: { countryCode, ...input },
+      }),
+    listStreets: async ({ cityId, countryCode = 'BGR', ...query }, headers) =>
+      sdk.client.fetch('/store/econt/streets', {
+        method: 'GET',
+        headers: {
+          ...(await options?.getAuthHeader?.()),
+          ...headers,
+        },
+        query: { cityId, countryCode, ...query },
+      }),
+    listRegions: async ({ countryCode = 'BGR', ...query }, headers) =>
+      sdk.client.fetch('/store/econt/regions', {
+        method: 'GET',
+        headers: {
+          ...(await options?.getAuthHeader?.()),
+          ...headers,
+        },
+        query: { countryCode, ...query },
       }),
   }),
 }
