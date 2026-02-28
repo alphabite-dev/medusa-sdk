@@ -1,6 +1,6 @@
 import Medusa, { ClientHeaders } from '@medusajs/js-sdk'
 import { CustomerDTO, FileDTO, ProductDTO } from '@medusajs/types'
-import { AlphabiteClientOptions, AlphabiteMedusaConfig, Plugin } from '..'
+import { AlphabiteClientOptions, Plugin } from '..'
 import { PaginatedInput, PaginatedOutput } from './types'
 
 /**
@@ -154,11 +154,7 @@ type ReviewsEndpoints = {
 
 export const reviewsPlugin: Plugin<'reviews', ReviewsEndpoints> = {
   name: 'reviews' as const,
-  endpoints: (
-    sdk: Medusa,
-    options?: AlphabiteClientOptions,
-    medusaConfig?: AlphabiteMedusaConfig,
-  ) => ({
+  endpoints: (sdk: Medusa, options?: AlphabiteClientOptions) => ({
     create: async (input, headers) =>
       sdk.client.fetch('/store/reviews', {
         method: 'POST',
@@ -206,30 +202,15 @@ export const reviewsPlugin: Plugin<'reviews', ReviewsEndpoints> = {
           ...headers,
         },
       }),
-    uploadImageFiles: async (input, headers) => {
-      const baseUrl = medusaConfig?.baseUrl
-      const publishableKey = medusaConfig?.publishableKey
-
-      if (!baseUrl || !publishableKey) {
-        throw new Error('Missing baseUrl or publishableKey')
-      }
-
-      const authHeader = await options?.getAuthHeader?.()
-
-      const uploadedFiles = await fetch(
-        `${baseUrl}/store/reviews/files/images/upload`,
-        {
-          method: 'POST',
-          body: input.formData,
-          headers: {
-            ...authHeader,
-            ...headers,
-            'x-publishable-api-key': publishableKey,
-          },
+    uploadImageFiles: async (input, headers) =>
+      sdk.client.fetch('/store/reviews/files/images/upload', {
+        method: 'POST',
+        body: input.formData,
+        headers: {
+          ...(await options?.getAuthHeader?.()),
+          ...headers,
+          'content-type': null,
         },
-      )
-
-      return await uploadedFiles.json()
-    },
+      }),
   }),
 }
