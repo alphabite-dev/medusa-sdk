@@ -161,12 +161,11 @@ export interface ListCitiesInput {
    */
   q?: string
   /**
-   * Filter by whether the city has at least one Econt office
-   * - `true`: only cities with offices (old default behavior)
-   * - `false`: only cities/villages without offices
-   * - omitted: all cities
+   * Filter to only return cities that have at least one Econt office
+   * - `true`: only cities with offices
+   * - omitted or `false`: all cities (default)
    */
-  hasOffice?: boolean
+  onlyWithOffices?: boolean
   /**
    * Comma-separated list of fields to include
    */
@@ -447,14 +446,14 @@ export const econtPlugin: Plugin<'econt', EcontEndpoints> = {
         },
         query: { countryCode, ...query },
       }),
-    listStreets: async ({ cityId, countryCode = 'BGR', ...query }, headers) =>
+    listStreets: async ({ cityId, ...query }, headers) =>
       sdk.client.fetch('/store/econt/streets', {
         method: 'GET',
         headers: {
           ...(await options?.getAuthHeader?.()),
           ...headers,
         },
-        query: { cityId, countryCode, ...query },
+        query: { cityId, ...query },
       }),
     listRegions: async ({ ...query }, headers) =>
       sdk.client.fetch('/store/econt/regions', {
